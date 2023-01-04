@@ -7,13 +7,14 @@
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import java.lang.Math;
 
 public class Game extends JFrame implements ActionListener {
     
     public JLabel lb; 
     public JButton[][] cell =  new JButton[8][8];
     public int[][] pos = new int[8][8];
-    int cpy=0, x, y, xi, yi, trn=0;
+    int cpy=0, x, y, xi, yi, trn=1;
 
     public static void main(String[] args) {
         Game demo = new Game();
@@ -35,7 +36,7 @@ public class Game extends JFrame implements ActionListener {
                 cell[x][y] = new JButton("");
                 cell[x][y].setBounds(x1, y1, 100, 100);
                 ventana.add(cell[x][y]);
-                cell[x][y].addActionListener( this); 
+                cell[x][y].addActionListener(this); 
                 if(y%2==0) if(x%2!=0) cell[x][y].setBackground(Color.GRAY);
                 if(y%2!=0) if(x%2==0) cell[x][y].setBackground(Color.GRAY);
             }
@@ -57,35 +58,90 @@ public class Game extends JFrame implements ActionListener {
     }
 
     public void actionPerformed(ActionEvent event) {
-        Object origen= event.getSource();  
+        Object origen = event.getSource();  
         
         for(int y=0; y<8; y++) {
             for(int x=0; x<8; x++) {
                 if(cpy==0){
-                    if(origen == cell[x][y]){
-                        if(pos[x][y]==0) break;
-                        xi=x;
-                        yi=y;
-                        cpy=1;
+                    if(trn==1){
+                        if((origen == cell[x][y]) && (pos[x][y]>10)){
+                            if(pos[x][y]==0) break;
+                            xi=x;
+                            yi=y;
+                            cpy=1;
+                            trn=0;
+                        } 
+                    } else {
+                        if((origen == cell[x][y]) && (pos[x][y]<10)){
+                            if(pos[x][y]==0) break;
+                            xi=x;
+                            yi=y;
+                            cpy=1;
+                            trn=1;
+                        } 
                     }
+
                 } else{
                     if(origen == cell[x][y]){
-                        // if(pos[xi][yi]==pos[x][y]) break;
+                        if(pos[xi][yi]==pos[x][y]) break;
+                        if(MOV_LIM(x, y, xi, yi) == false){
+                            JOptionPane.showMessageDialog(null, "Movimiento invalido");
+                            break;
+                        }
+                    
                         cell[xi][yi].setIcon(new ImageIcon(""));
                         cell[x][y].setIcon(new ImageIcon("pieces/"+pos[xi][yi]+".png"));
                         pos[x][y]=pos[xi][yi];
                         pos[xi][yi]=0;
 
-                        cpy=0; 
+                        cpy=0;
+                        for(int yz=0; yz<8; yz++) {
+                            for(int xz=0; xz<8; xz++) {
+                                System.out.print(" "+pos[xz][yz]);
+                            }
+                            System.out.print("\n");
+                        }
                     }
                 }
             } 
         } 
         
     }
+    
+    public boolean MOV_LIM(int x, int y, int xi, int yi){
+        if(pos[xi][yi]%10==1){
+            if((xi==x) && (Math.abs(yi-y)==1)) return true;
+            else return false;
+        }
+        
+        return true;
+    }
+
+    public void libMOV(){
+
+    }
+
+    public void Hacked(){
+
+    }
+
+    public void turn(){
+
+    }
+
+    
+
+
 }
 
 
 // Que no se coma a si misma
 
 // Pa que no se coman entre si podemos limitarlos por rangos :)
+
+// Para los turnos podemos usar un flag que grabe like: 
+
+// if (x==tal) todos los que se hayan usado antes no tienen ninguna accion
+// else 
+
+// pero hay que ver bien 
